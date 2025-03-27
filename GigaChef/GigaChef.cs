@@ -6,16 +6,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DotNetEnv;
+using Discord.Net;
+using Newtonsoft.Json;
 
 namespace GigaChef
 {
-    public class Program
+    public class Bot
     {
         private static DiscordSocketClient _client;
+        private static CommandHandler _commandHandler;
 
         public static async Task Main(string[] args)
         {
-            _client = new DiscordSocketClient();
+            _client = new DiscordSocketClient(new DiscordSocketConfig
+            {
+                GatewayIntents = GatewayIntents.Guilds
+            });
+
+            _commandHandler = new CommandHandler(_client);
 
             _client.Log += Log;
 
@@ -25,6 +33,7 @@ namespace GigaChef
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
+
             await Task.Delay(-1);
         }
 
@@ -33,5 +42,6 @@ namespace GigaChef
             Console.WriteLine(msg.ToString());
             return Task.CompletedTask;
         }
+
     }
 }
