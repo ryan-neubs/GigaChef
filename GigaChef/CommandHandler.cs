@@ -11,10 +11,11 @@ namespace GigaChef
     public class CommandHandler
     {
         private readonly DiscordSocketClient _client;
-
-        public CommandHandler(DiscordSocketClient client)
+        private readonly LoggingService _logger;
+        public CommandHandler(DiscordSocketClient client, LoggingService logger)
         {
             _client = client;
+            _logger = logger;
             _client.Ready += RegisterCommandsAsync;
             _client.SlashCommandExecuted += HandleSlashCommand;
         }
@@ -23,18 +24,29 @@ namespace GigaChef
         {
             var guild = _client.GetGuild(1102454152908517436);
 
-            var cookCommand = new SlashCommandBuilder()
-                .WithName("cook")
-                .WithDescription("Responds with 'YES CHEF'");
-
-            try
+            List<SlashCommandBuilder> commands = new List<SlashCommandBuilder>();
+            commands.Add(
+                new SlashCommandBuilder()
+                    .WithName("cook")
+                    .WithDescription("Responds with 'YES CHEF'")
+                );
+            commands.Add(
+                new SlashCommandBuilder()
+                    .WithName("ping")
+                    .WithDescription("Responds with 'pong' to test if bot is repsonding.")
+                );
+                
+            foreach (var command in commands)
             {
-                await guild.CreateApplicationCommandAsync(cookCommand.Build());
-                Console.WriteLine("Slash Command /cook registered");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error registering command: {ex.Message}");
+                try
+                {
+                    await guild.CreateApplicationCommandAsync(command.Build());
+                    _logger.LogInfo("Cmd Handler: ", $"Slash Command /{command.Name} registered");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInfo("Cmd Handler: ", $"Error registering /{command.Name} command: {ex.Message}");
+                }
             }
         }
 
@@ -42,8 +54,14 @@ namespace GigaChef
         {
             if (command.Data.Name == "cook")
             {
-                await command.RespondAsync("YES CHEF!");
+                await command.RespondAsync("YES CHEF!"); 
             }
+
+            if (command.Data.Name == "ping")
+            {
+                await command.RespondAsync("pong");
+            }
+            _logger.LogInfo("Cmd Handler: ", $"{command.User} executed command /{command.Data.Name}");
         }
 
     }

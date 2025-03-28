@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DotNetEnv;
 using Discord.Net;
 using Newtonsoft.Json;
+using Discord.Commands;
 
 namespace GigaChef
 {
@@ -15,6 +16,7 @@ namespace GigaChef
     {
         private static DiscordSocketClient _client;
         private static CommandHandler _commandHandler;
+        private static LoggingService _loggingService;
 
         public static async Task Main(string[] args)
         {
@@ -23,9 +25,8 @@ namespace GigaChef
                 GatewayIntents = GatewayIntents.Guilds
             });
 
-            _commandHandler = new CommandHandler(_client);
-
-            _client.Log += Log;
+            _loggingService = new LoggingService(_client);
+            _commandHandler = new CommandHandler(_client, _loggingService);
 
             Env.Load("C:/Users/kmneu/source/repos/GigaChef/GigaChef/.env");
             var token = Environment.GetEnvironmentVariable("TOKEN");
@@ -36,12 +37,5 @@ namespace GigaChef
 
             await Task.Delay(-1);
         }
-
-        private static Task Log(LogMessage msg)
-        {
-            Console.WriteLine(msg.ToString());
-            return Task.CompletedTask;
-        }
-
     }
 }
