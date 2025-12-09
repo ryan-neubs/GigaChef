@@ -39,7 +39,7 @@ public class DiscordBot
             return default;
         };
 
-        // Message created
+        // Message created logs
         _client.MessageCreate += message =>
         {
             Logger.WriteLog($"<[{message.ChannelId}:{message.Author.Username}]> {message.Content}");
