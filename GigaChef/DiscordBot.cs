@@ -46,7 +46,7 @@ public class DiscordBot
             return default;
         };
 
-        // Reaction added
+        // Logger for message reactions
         _client.MessageReactionAdd += args =>
         {
             Logger.WriteLog($"<[{args.ChannelId} {args.User?.Username}]> reacted with {args.Emoji.Name}!");
